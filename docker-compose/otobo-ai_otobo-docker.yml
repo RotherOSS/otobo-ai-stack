@@ -1,4 +1,4 @@
-# Docker compose file for "Roboto", the OTOBO AI service.
+# Docker compose file for the OTOBO AI stack.
 
 # See also https://github.com/RotherOSS/otobo-ai-services#
 # See also dockerhub...
