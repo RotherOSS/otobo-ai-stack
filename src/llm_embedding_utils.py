@@ -61,7 +61,7 @@ def _list_label_collection_names(type_name: str) -> list:
     prefix = f"{type_name}__"
     names = []
     for c in _get_chroma_client().list_collections():
-        name = getattr(c, "name", c)
+        name = c if isinstance(c, str) else c.name
         if name.startswith(prefix):
             names.append(name)
     return names
