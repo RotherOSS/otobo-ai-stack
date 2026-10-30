@@ -268,11 +268,11 @@ async def purge_collection(
     return { "success": True  }
 
 @logger.catch(reraise=True)
-async def purge_vectorstore(with_embedding: bool = True):
+async def purge_vectorstore():
     collections = [ "faqs", "ticket_pairs", "ticket_chunks", "docs"  ]
     for collection in collections:
 
-        await purge_collection(with_embedding=with_embedding, collection_name=collection )
+        await purge_collection(collection_name=collection)
 
     return { "success": True  }
 

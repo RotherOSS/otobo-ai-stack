@@ -191,7 +191,7 @@ async def put(embeds: IngestInput):
 )
 async def purge():
     logger.error(f"purge all")
-    return await purge_vectorstore(True)
+    return await purge_vectorstore()
 
 # purge the a collection from vector store + database
 @app.delete(
