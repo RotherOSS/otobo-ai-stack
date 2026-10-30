@@ -262,6 +262,8 @@ async def purge_collection(
         else:
             for physical_name in _list_label_collection_names(collection_name):
                 _delete_physical_collection(physical_name)
+            # Also drop the unprefixed collection used before the per-label collections
+            _delete_physical_collection(collection_name)
             await conn.execute("DELETE FROM source_vector_index_map WHERE collection_name = %s", collection_name)
             await conn.execute("DELETE FROM fulltext_documents WHERE collection_name = %s", collection_name)
 
