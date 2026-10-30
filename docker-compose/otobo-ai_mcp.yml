@@ -1,6 +1,7 @@
 services:
   mcp:
-    image: rotheross/otobo-ai-mcp:latest
+    image: rotheross/otobo-ai-mcp:${OTOBO_MCP_IMAGE_VERSION:-latest}
+    restart: unless-stopped
     networks:
       - otobo_default
     environment:
@@ -15,8 +16,14 @@ services:
         - OTOBO_MCP_LOGLEVEL=${OTOBO_MCP_LOGLEVEL:-40}
         # see https://docs.python.org/3/library/logging.html#logging-levels
         # for loglevel description
+        - OTOBO_MCP_MAX_TOKENS=${OTOBO_MCP_MAX_TOKENS:-10000}
+        - OTOBO_MCP_CHARS_PER_TOKEN=${OTOBO_MCP_CHARS_PER_TOKEN:-3}
+        - OTOBO_MCP_IGNORED_LINKED_TICKET_STATES=${OTOBO_MCP_IGNORED_LINKED_TICKET_STATES:-merged,removed}
+        - OTOBO_MCP_STATELESS=${OTOBO_MCP_STATELESS:-false}
+        - OTOBO_MCP_ELICITATION=${OTOBO_MCP_ELICITATION:-required}
+        - OTOBO_MCP_ELICITATION_TIMEOUT=${OTOBO_MCP_ELICITATION_TIMEOUT:-300}
+        - OTOBO_MCP_RESOURCE_SERVER_URL=${OTOBO_MCP_RESOURCE_SERVER_URL:-http://mcp:8765/mcp}
 
 networks:
   otobo_default:
     external: true
-

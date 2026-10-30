@@ -1,12 +1,12 @@
-# Docker compose file for "Roboto", the OTOBO AI service.
+# Docker compose file for the OTOBO AI stack.
 
 # See also https://github.com/RotherOSS/otobo-ai-services#
 # See also dockerhub...
 
 services:
   rag:
-    image: ${OTOBO_IMAGE_OTOBO_AI:-rotheross/otobo-ai-services:latest}
-    restart: always
+    image: rotheross/otobo-ai-rag:${OTOBO_AI_IMAGE_VERSION:-latest}
+    restart: unless-stopped
     env_file:
       - ../.env
     environment:

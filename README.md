@@ -7,10 +7,10 @@ Each RAG module defines its own retrieval/generation logic and API schema, loade
 The system uses **LangGraph**, **LangChain**, and **ChromaDB** to support flexible embedding and LLM-powered generation.
 It exposes a REST API via **FastAPI** for ingesting content and interacting with configured RAGs.
 
-Further an MCP and a chat interface are included to enable agents to interface with an LLM directly that is capable to call actions in OTOBO.
-The chat interface is provided by https://github.com/open-webui/open-webui
+Furthermore, an MCP server and a chat interface are included, enabling agents to interact directly with an LLM that is capable of calling actions in OTOBO.
+The chat interface is provided by https://github.com/open-webui/open-webui.
 
-You may find documentation on how to use this with OTOBO here: https://doc.otobo.org
+You may find documentation on how to use this with OTOBO here: https://doc.otobo.org.
 
 ---
 
@@ -21,17 +21,17 @@ Clone the repository and set up the environment using Docker Compose:
 ### 1. Clone the Repository
 
 ```bash
-git clone git@github.com:RotherOSS/otobo-ai.git
-cd otobo-ai
+git clone git@github.com:RotherOSS/otobo-ai-stack.git
+cd otobo-ai-stack
 ```
 
 ### 2. Get a RAG definition
 
-Example RAG definitions are provided under `rag_examples`.
+Example RAG definitions are provided under `rags_examples`.
 If you use this setup with OTOBO, choose the `default`.
 It supports Tickets, FAQ and Documentation.
 
-Copy the RAG description to your RAG definition folder.
+Copy the RAG definition to your RAG definition folder.
 
 ```bash
 cp -r rags_examples/default rags
@@ -45,24 +45,30 @@ You may tune it to your liking, or create a new one!
 Create a `.env` file in the root directory to configure environment variables:
 
 ```bash
-cp .docker_compose_env_ai .env
+cp .env-example .env
 ```
 
 Edit the `.env` file to set your desired configuration options.
-The file is self-documented. 
+The file is self-documented.
 
 > [!IMPORTANT]
-> For usage with an OTOBO docker setups, docker compose v2 is required.
+> For usage with an OTOBO Docker setup, Docker Compose v2 is required.
 
 ### 4. Start the Containers
 
-Use Docker Compose to build and run the server:
+Use Docker Compose to pull and run the server:
+
+```bash
+docker compose up --detach
+```
+
+To build the image locally instead, add `docker-compose/otobo-ai_dev.yml` to `COMPOSE_FILE` and run:
 
 ```bash
 docker compose up --build --detach
 ```
 
-The `docker compose.yaml` mounts the local `./rags` directory into the container as `src/rags`, enabling external customization.
+The compose files in `docker-compose/` mount the local `./rags` directory into the container as `src/rags`, enabling external customization.
 
 ---
 
@@ -164,7 +170,7 @@ Run the full RAG process (retrieve and generate).
 ```
 
 Each RAG can define its own input/output models, but this is the expected default format.
-Note that only the `input` and `output` fields are relevant for usage within OTOBO, the other fields are automatically provided by **LangServe**
+Note that only the `input` and `output` fields are relevant for usage within OTOBO, the other fields are automatically provided by **LangServe**.
 
 ---
 
@@ -203,7 +209,8 @@ These models define the request and response schema for your RAG.
   Use this to separate LangChain logic or define chains used in your workflow.
 
 - **`prompts/`**
-  Store custom prompt templates here. Load them with `Path(__file__).parent / "prompts" / "prompt.txt"`.
+  Store custom prompt templates here.
+  Load them with `Path(__file__).parent / "prompts" / "prompt.txt"`.
 
 ### Example: Minimal `graph.py`
 
@@ -242,20 +249,21 @@ Each RAG module must follow this structure:
 
 ### Repository Structure
 
-Only `rag_examples/` is version-controlled. The `src/rags/` directory is `.gitignore`d so users can safely define custom modules without affecting the repo.
+Only `rags_examples/` is version-controlled.
+The `src/rags/` directory is `.gitignore`d so users can safely define custom modules without affecting the repo.
 
 ```bash
 src/
 ├── rags/              ← not version controlled
-│   ├── simple_rag/    ← copy or create your RAG modules here
+│   ├── default/       ← copy or create your RAG modules here
 │   │   ├── graph.py
 │   │   ├── chains.py
 │   │   ├── io_models.py
 │   │   └── prompts/
 │   └── ...
 └── ...
-rag_examples/          ← reference implementations
-├── simple_rag/
+rags_examples/         ← reference implementations
+├── default/
 └── ...
 ```
 
@@ -267,7 +275,7 @@ To update the dependencies in a controlled way:
 
 ### 1. Unpin Non-Critical Dependencies
 
-In `requirements.txt`, remove version pins from most packages.
+In `src/requirements.txt`, remove version pins from most packages.
 Keep pins **only** for critical compatibility fixes.
 
 **Before:**
@@ -313,12 +321,12 @@ Verify ingestion and RAG endpoints still work correctly.
 After confirming stability, inspect the installed versions:
 
 ```bash
-docker compose run --rm otobo-ai pip list
+docker compose run --rm rag pip list
 ```
 
 ### 6. Pin Final Versions
 
-Use the output to update `requirements.txt` with the final versions used.
+Use the output to update `src/requirements.txt` with the final versions used.
 
 **Example:**
 
@@ -333,6 +341,6 @@ numpy==1.26.4
 ### 7. Commit the Changes
 
 ```bash
-git add requirements.txt
+git add src/requirements.txt
 git commit -m "Update pinned dependencies"
 ```
